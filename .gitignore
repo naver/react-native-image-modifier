@@ -49,3 +49,4 @@ ios-filters.txt
 .ionide
 yarn.lock
 .npmrc
+.idea
