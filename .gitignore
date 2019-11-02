@@ -1,0 +1,51 @@
+**/.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+**/out/
+
+blueprint-templates/
+
+.vscode/
+
+dist/
+
+**/index.android.bundle
+
+**/infer-out
+
+examples/Sim*
+examples/*old
+RNIFKTest_old
+Sim60
+index.tmp
+ios-filters.txt
+.ionide
+yarn.lock
+.npmrc

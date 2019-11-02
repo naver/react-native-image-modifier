@@ -1,0 +1,36 @@
+{
+  "name": "@naver/react-native-image-modifier",
+  "version": "0.1.13",
+  "description": "Modify local images by the React-native module. (IOS, Android)",
+  "main": "index.js",
+  "scripts": {
+    "start-example-ios": "cd example && react-native run-ios",
+    "start-example-android": "cd example && react-native run-android",
+    "publish-package": "yarn publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naver/react-native-image-modifier/react-native-image-modifier.git"
+  },
+  "keywords": [
+    "image",
+    "filter",
+    "gray",
+    "modifier",
+    "resize",
+    "base64",
+    "encoding"
+  ],
+  "author":{
+    "name": "kellin.me",
+    "email": "kellin.me@navercorp.com"
+  },
+  "contributors":[
+    "leekyoungil <leekyoungil@gmail.com> (https://leekyoungil.github.io)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/naver/react-native-image-modifier/issues"
+  },
+  "homepage": "https://github.com/naver/react-native-image-modifier#readme"
+}
