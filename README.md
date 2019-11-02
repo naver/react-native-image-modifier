@@ -9,7 +9,7 @@ A React-native module it can modify an image by simply.
  - base64 encoding
 
 ### latest version
- - 0.1.12
+ - 0.1.2
 
 ## install
 
@@ -28,7 +28,7 @@ react-native link react-native-image-modifier
 * add to yarn package.json
 ```
 "dependencies": {
-    "@naver/react-native-image-modifier": "^0.1.12"
+    "react-native-image-modifier": "^0.1.2"
 }
 ```
 
@@ -97,14 +97,14 @@ const { success, errorMsg, imageURI, base64String } = await ImageModifier.modify
 
 ### android
   - Open `android/app/src/main/java/your project name/MainApplication.java`
-  - Add `import com.naver.tapas.RNImageModifierPackage;` to the imports line
+  - Add `import com.naver.rn.RNImageModifierPackage;` to the imports line
   - Add `new RNImageModifierPackage()` to the list of the `getPackages()` method
 
   - Insert to the `android/settings.gradle`
 
   	```
   	include ':react-native-image-modifier'
-  	project(':react-native-image-modifier').projectDir = new File(rootProject.projectDir, 	'../node_modules/@naver/react-native-image-modifier/android')
+  	project(':react-native-image-modifier').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-image-modifier/android')
   	```
 
  - Insert the line of dependencies block in `android/app/build.gradle`

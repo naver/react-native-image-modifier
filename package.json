@@ -1,6 +1,6 @@
 {
-  "name": "@naver/react-native-image-modifier",
-  "version": "0.1.13",
+  "name": "react-native-image-modifier",
+  "version": "0.1.2",
   "description": "Modify local images by the React-native module. (IOS, Android)",
   "main": "index.js",
   "scripts": {
@@ -21,11 +21,8 @@
     "base64",
     "encoding"
   ],
-  "author":{
-    "name": "kellin.me",
-    "email": "kellin.me@navercorp.com"
-  },
-  "contributors":[
+  "author": "kellin.me <kellin.me@navercorp.com>",
+  "contributors": [
     "leekyoungil <leekyoungil@gmail.com> (https://leekyoungil.github.io)"
   ],
   "license": "MIT",
