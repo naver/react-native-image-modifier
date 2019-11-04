@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-modifier",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Modify local images by the React-native module. (IOS, Android)",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/naver/react-native-image-modifier/react-native-image-modifier.git"
+    "url": "git+https://github.com/naver/react-native-image-modifier.git"
   },
   "keywords": [
     "image",
