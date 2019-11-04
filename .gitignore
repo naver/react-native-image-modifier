@@ -50,3 +50,6 @@ ios-filters.txt
 yarn.lock
 .npmrc
 .idea
+.gradle
+.setting
+.project

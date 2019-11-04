@@ -1,2 +1,5 @@
 .github
 .idea
+.gradle
+.setting
+.project

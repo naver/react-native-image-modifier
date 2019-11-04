@@ -5,6 +5,10 @@ A React-native module it can modify an image by simply.
 ### npm registry
  - https://www.npmjs.com/package/react-native-image-modifier
 
+### tested Environment
+ - ios 9.0 or higher
+ - android 8.0 or higher
+
 ### supported features.
  - resize
  - quality
