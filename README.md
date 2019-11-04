@@ -2,6 +2,9 @@
 
 A React-native module it can modify an image by simply.
 
+### npm registry
+ - https://www.npmjs.com/package/react-native-image-modifier
+
 ### supported features.
  - resize
  - quality
@@ -9,7 +12,7 @@ A React-native module it can modify an image by simply.
  - base64 encoding
 
 ### latest version
- - 0.1.2
+ - 0.1.3
 
 ## install
 
@@ -28,7 +31,7 @@ react-native link react-native-image-modifier
 * add to yarn package.json
 ```
 "dependencies": {
-    "react-native-image-modifier": "^0.1.2"
+    "react-native-image-modifier": "^0.1.3"
 }
 ```
 
