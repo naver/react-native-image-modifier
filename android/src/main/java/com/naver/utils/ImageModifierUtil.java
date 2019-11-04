@@ -79,13 +79,11 @@ public class ImageModifierUtil {
                 throw ex;
             }
         } else {
-            InputStream input = context.getContentResolver().openInputStream(imageURI);
-            if (input != null) {
-                Bitmap sourceImage = BitmapFactory.decodeStream(input, null, options);
-                input.close();
-                return sourceImage;
+            try(InputStream input = context.getContentResolver().openInputStream(imageURI)) {
+                return BitmapFactory.decodeStream(input, null, options);
+            } catch (Exception ex) {
+                throw new Exception("An error occurred while working on Bitmap processing by URI.");
             }
-            throw new Exception("An error occurred while working on Bitmap processing by URI.");
         }
     }
 
@@ -133,13 +131,19 @@ public class ImageModifierUtil {
             throw new IOException("image file already exists.");
         }
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        image.compress(compressFormat, (int)(imageQuality * 100), outputStream);
+        byte[] imageDataArray;
+        try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            image.compress(compressFormat, (int)(imageQuality * 100), outputStream);
 
-        byte[] imageDataArray = outputStream.toByteArray();
+            imageDataArray = outputStream.toByteArray();
+            outputStream.flush();
+        } catch (Exception ex) {
+            throw new Exception("An error occurred during image compression.");
+        }
 
-        outputStream.flush();
-        outputStream.close();
+        if (imageDataArray == null || imageDataArray.length == 0) {
+            throw new Exception("The image data array problem has occurred.");
+        }
 
         FileOutputStream fos = new FileOutputStream(savePath);
         fos.write(imageDataArray);
@@ -166,12 +170,14 @@ public class ImageModifierUtil {
         return convertedImage;
     }
 
-    public static String getBase64FromBitmap(Bitmap bitmap, final Bitmap.CompressFormat compressFormat) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(compressFormat, 100, byteArrayOutputStream);
-        final String base64Encoded = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
-        bitmap.recycle();
-        
-        return base64Encoded;
+    public static String getBase64FromBitmap(Bitmap bitmap, final Bitmap.CompressFormat compressFormat) throws Exception {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            bitmap.compress(compressFormat, 100, byteArrayOutputStream);
+            final String base64Encoded = Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT);
+            bitmap.recycle();
+            return base64Encoded;
+        } catch (Exception ex) {
+            throw new Exception("There was a problem while image to base64 converting.");
+        }
     }
 }
