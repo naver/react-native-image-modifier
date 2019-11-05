@@ -16,7 +16,7 @@ A React-native module it can modify an image by simply.
  - base64 encoding
 
 ### latest version
- - 0.1.5
+ - 0.1.6
 
 ## install
 
@@ -35,7 +35,7 @@ react-native link react-native-image-modifier
 * add to yarn package.json
 ```
 "dependencies": {
-    "react-native-image-modifier": "^0.1.5"
+    "react-native-image-modifier": "^0.1.6"
 }
 ```
 
