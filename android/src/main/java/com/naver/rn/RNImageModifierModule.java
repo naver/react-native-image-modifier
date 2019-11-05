@@ -75,74 +75,82 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void imageModifier(ReadableMap data, final Callback responseCb) {
-    String errorMessage = null;
-    if (data.hasKey(PATH_KEY) == false) {
-      errorMessage = ERROR_MESSAGE_EMPTY_URI_KEY;
-    } else if (StringUtils.isStringValid(data.getString(PATH_KEY))) {
-      errorMessage = ERROR_MESSAGE_EMPTY_URI_VALUE;
+    final String errorMessage = this.requiredDataValidate(data);
+    if (StringUtils.isStringValid(errorMessage)) {
+      responseCb.invoke(this.getReturnMessage(false, errorMessage));
     }
 
-    if (StringUtils.isStringValid(errorMessage)) {
-      Uri imageURI = Uri.parse(data.getString(PATH_KEY));
+    Uri imageURI = Uri.parse(data.getString(PATH_KEY));
+
+    try {
+      Bitmap sourceImage = ImageModifierUtil.getSourceImageByPath(this.reactContext, imageURI);
+
+      Bitmap resizeImage = null;
+      if (data.hasKey(RESIZE_RATIO_KEY) == true) {
+        final float resizeRatio = Float.parseFloat(data.getString(RESIZE_RATIO_KEY));
+        if (resizeRatio > 0.0 && resizeRatio < 1.0) {
+          resizeImage = ImageModifierUtil.getImageByResize(sourceImage, resizeRatio, false);
+        }
+      }
+
+      Bitmap grayscaleImage = null;
+      if (data.hasKey(GRAYSCALE_KEY) && Boolean.parseBoolean(data.getString(GRAYSCALE_KEY))) {
+        grayscaleImage = ImageModifierUtil.imageToGrayscale(resizeImage != null ? resizeImage : sourceImage);
+      }
+
+      float imageQuality = 1.0f;
+      if (data.hasKey(IMAGE_QUALITY_KEY) == true) {
+        try {
+          imageQuality = Float.parseFloat(data.getString(IMAGE_QUALITY_KEY));
+        } catch (NumberFormatException ignore) {}
+      }
+
+      Bitmap targetImage = this.getTargetBitmap(grayscaleImage, resizeImage, sourceImage);
+      sourceImage.recycle();
 
       try {
-        Bitmap sourceImage = ImageModifierUtil.getSourceImageByPath(this.reactContext, imageURI);
-
-        Bitmap resizeImage = null;
-        if (data.hasKey(RESIZE_RATIO_KEY) == true) {
-          final float resizeRatio = Float.parseFloat(data.getString(RESIZE_RATIO_KEY));
-          if (resizeRatio > 0.0 && resizeRatio < 1.0) {
-            resizeImage = ImageModifierUtil.getImageByResize(sourceImage, resizeRatio, false);
-          }
-        }
-
-        Bitmap grayscaleImage = null;
-        if (data.hasKey(GRAYSCALE_KEY) && Boolean.parseBoolean(data.getString(GRAYSCALE_KEY))) {
-          grayscaleImage = ImageModifierUtil.imageToGrayscale(resizeImage != null ? resizeImage : sourceImage);
-        }
-
-        float imageQuality = 1.0f;
-        try {
-          if (data.hasKey(IMAGE_QUALITY_KEY) == true) {
-            imageQuality = Float.parseFloat(data.getString(IMAGE_QUALITY_KEY));
-          }
-        } catch (NumberFormatException ignore) {}
-
-        Bitmap targetImage;
-        if (grayscaleImage != null) {
-          targetImage = Bitmap.createBitmap(grayscaleImage);
-          grayscaleImage.recycle();
-
-          if (resizeImage != null) {
-            resizeImage.recycle();
-          }
-        } else if (resizeImage != null) {
-          targetImage = Bitmap.createBitmap(resizeImage);
-          resizeImage.recycle();
+        WritableMap response = this.getReturnMessage(true);
+        if (data.hasKey(BASE64_KEY) && Boolean.parseBoolean(data.getString(BASE64_KEY))) {
+          response.putString(BASE64_STRING_KEY, ImageModifierUtil.getBase64FromBitmap(targetImage, COMPRESS_FORMAT));
         } else {
-          targetImage = Bitmap.createBitmap(sourceImage);
+          response.putString(IMAGE_URI_KEY, this.saveToLocalStorage(targetImage, imageQuality));
         }
-        sourceImage.recycle();
 
-        try {
-          WritableMap response = this.getReturnMessage(true);
-          if (data.hasKey(BASE64_KEY) && Boolean.parseBoolean(data.getString(BASE64_KEY))) {
-            response.putString(BASE64_STRING_KEY, ImageModifierUtil.getBase64FromBitmap(targetImage, COMPRESS_FORMAT));
-          } else {
-            response.putString(IMAGE_URI_KEY, this.saveToLocalStorage(targetImage, imageQuality));
-          }
-          
-          targetImage.recycle();
-          responseCb.invoke(response);
-        } catch (Exception ex) {
-          responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
-        }
+        targetImage.recycle();
+        responseCb.invoke(response);
       } catch (Exception ex) {
         responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
       }
-    } else {
-      responseCb.invoke(this.getReturnMessage(false, errorMessage));
+    } catch (Exception ex) {
+      responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
     }
+  }
+
+  private Bitmap getTargetBitmap(Bitmap grayscaleImage, Bitmap resizeImage, Bitmap sourceImage) {
+    Bitmap targetImage;
+    if (grayscaleImage != null) {
+      targetImage = Bitmap.createBitmap(grayscaleImage);
+      grayscaleImage.recycle();
+
+      if (resizeImage != null) {
+        resizeImage.recycle();
+      }
+    } else if (resizeImage != null) {
+      targetImage = Bitmap.createBitmap(resizeImage);
+      resizeImage.recycle();
+    } else {
+      targetImage = Bitmap.createBitmap(sourceImage);
+    }
+    return targetImage;
+  }
+
+  private String requiredDataValidate(ReadableMap data) {
+    if (data.hasKey(PATH_KEY) == false) {
+      return ERROR_MESSAGE_EMPTY_URI_KEY;
+    } else if (StringUtils.isStringValid(data.getString(PATH_KEY))) {
+      return ERROR_MESSAGE_EMPTY_URI_VALUE;
+    }
+    return null;
   }
 
   private String saveToLocalStorage(Bitmap targetImage, final float imageQuality) throws Exception {

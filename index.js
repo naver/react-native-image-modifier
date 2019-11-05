@@ -27,43 +27,36 @@ class ImageModifier {
     static modify(param) {
         ImageModifier.paramValidate(param)
 
-        try {
-            if (Platform.OS === "ios") {
-              return new Promise((resolve) => {
-                RNImageModifier.imageModifier(param, (err, response) => {
-                  if (err) {
-                    return {
-                      success: false,
-                      errorMsg: err
-                    }
+        if (Platform.OS === "ios") {
+            return new Promise((resolve) => {
+              RNImageModifier.imageModifier(param, (err, response) => {
+                if (err) {
+                  return {
+                    success: false,
+                    errorMsg: err
                   }
-                  resolve(response);
-                });
-              }).catch(function (err) {
+                }
+                resolve(response);
+              });
+            }).catch(function (err) {
+                  return {
+                      success: false,
+                      errorMsg: "check your ios native module setting. ("+err+")"
+                  }
+            });
+        } else if (Platform.OS === "android") {
+            return new Promise((resolve) => {
+                RNImageModifier.imageModifier(param, resolve);
+            }).catch(function (err) {
                     return {
                         success: false,
-                        errorMsg: err
+                        errorMsg: "check your android native module setting. ("+err+")"
                     }
-              });
-            } else if (Platform.OS === "android") {
-                return new Promise((resolve) => {
-                    RNImageModifier.imageModifier(param, resolve);
-                  }).catch(function (err) {
-                        return {
-                            success: false,
-                            errorMsg: err
-                        }
-                  });
-            } else {
-                return {
-                    success: false,
-                    errorMsg: "not yet supported.("+Platform.OS+")"
-                }
-            }
-        } catch(error) {
+            });
+        } else {
             return {
                 success: false,
-                errorMsg: "check your native("+Platform.OS+") module setting."
+                errorMsg: "not yet supported.("+Platform.OS+")"
             }
         }
     }

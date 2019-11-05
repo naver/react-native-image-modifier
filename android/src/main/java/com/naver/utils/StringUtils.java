@@ -26,9 +26,6 @@ package com.naver.utils;
 public class StringUtils {
 
     public static boolean isStringValid(final String checkString) {
-        if (checkString == null || checkString.trim().length() == 0) {
-            return false;
-        }
-        return true;
+        return (checkString != null && checkString.trim().length() > 0);
     }
 }
