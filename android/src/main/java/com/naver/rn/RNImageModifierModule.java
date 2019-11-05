@@ -149,7 +149,7 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
   private String requiredDataValidate(ReadableMap data) {
     if (data.hasKey(PATH_KEY) == false) {
       return ERROR_MESSAGE_EMPTY_URI_KEY;
-    } else if (StringUtils.isStringValid(data.getString(PATH_KEY))) {
+    } else if (StringUtils.isStringValid(data.getString(PATH_KEY)) == false) {
       return ERROR_MESSAGE_EMPTY_URI_VALUE;
     }
     return null;
