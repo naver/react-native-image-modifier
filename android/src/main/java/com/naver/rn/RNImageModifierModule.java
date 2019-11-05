@@ -78,6 +78,7 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
     final String errorMessage = this.requiredDataValidate(data);
     if (StringUtils.isStringValid(errorMessage)) {
       responseCb.invoke(this.getReturnMessage(false, errorMessage));
+      return;
     }
 
     Uri imageURI = Uri.parse(data.getString(PATH_KEY));
@@ -122,6 +123,7 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
         responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
       }
     } catch (Exception ex) {
+      ex.printStackTrace();
       responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
     }
   }
