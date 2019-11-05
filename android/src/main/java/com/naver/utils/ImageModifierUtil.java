@@ -56,7 +56,7 @@ public class ImageModifierUtil {
         final String imageURIScheme = imageURI.getScheme();
 
         Bitmap sourceImage = null;
-        if (StringUtils.isStringValid(imageURIScheme) || URI_FILE_CONTENT.contains(imageURIScheme.toLowerCase())) {
+        if (StringUtils.isStringValid(imageURIScheme) == false || URI_FILE_CONTENT.contains(imageURIScheme.toLowerCase())) {
             sourceImage = loadBitmapImage(context, imageURI);
         } else if (imageURIScheme.equalsIgnoreCase(URI_DATA)) {
             sourceImage = loadBitmapImageByBase64(imageURI);
