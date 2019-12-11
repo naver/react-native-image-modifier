@@ -30,12 +30,14 @@ static NSString *const SUCCESS_KEY = @"success";
 static NSString *const ERROR_MESSAGE_KEY = @"errorMsg";
 static NSString *const IMAGE_URI_KEY = @"imageURI";
 static NSString *const BASE64_KEY = @"base64";
+static NSString *const EXIF_KEY = @"exif";
 
 static NSString *const PATH_KEY = @"path";
 static NSString *const GRAYSCALE_KEY = @"grayscale";
 static NSString *const RESIZE_RATIO_KEY = @"resizeRatio";
 static NSString *const IMAGE_QUALITY_KEY = @"imageQuality";
 static NSString *const BASE64_STRING_KEY = @"base64String";
+static NSString *const EXTRACT_EXIF_KEY = @"extractEXIF";
 
 static NSString *const SAVE_IMAGE_FILE_NAME_BY_OVERWRITE = @"modifiedImage.jpg";
 
@@ -87,6 +89,7 @@ RCT_EXPORT_METHOD(imageModifier:(NSDictionary *) params
     }
     
     NSString *const encodedURI = [uri stringByRemovingPercentEncoding];
+    
     UIImage *const originImage = [self getNSImageByURI: encodedURI];
     UIImage *const resizedImage = [self modifyImage:originImage resizeRatio:resizeRatio];
     
@@ -95,18 +98,17 @@ RCT_EXPORT_METHOD(imageModifier:(NSDictionary *) params
         grayscaleImage = [self convertToGray:resizedImage];
     }
     
-    NSDictionary *response;
+    NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
     if ([params objectForKey:BASE64_KEY] && [params[BASE64_KEY] boolValue]) {
-        response = @{
-            SUCCESS_KEY: @YES,
-            BASE64_STRING_KEY:[self getBase64FromImage:(grayscaleImage != nil ? grayscaleImage : resizedImage)]
-        };
+        [response setObject:@YES forKey:SUCCESS_KEY];
+        [response setObject:[self getBase64FromImage:(grayscaleImage != nil ? grayscaleImage : resizedImage)] forKey:BASE64_STRING_KEY];
     } else {
-        response = @{
-            SUCCESS_KEY: @YES,
-            IMAGE_URI_KEY:
-                [self saveImageToLocal:(grayscaleImage != nil ? grayscaleImage : resizedImage) fileName:SAVE_IMAGE_FILE_NAME_BY_OVERWRITE imageQuality:imageQuality]
-        };
+        [response setObject:@YES forKey:SUCCESS_KEY];
+        [response setObject:[self saveImageToLocal:(grayscaleImage != nil ? grayscaleImage : resizedImage) fileName:SAVE_IMAGE_FILE_NAME_BY_OVERWRITE imageQuality:imageQuality] forKey:IMAGE_URI_KEY];
+    }
+    
+    if ([params objectForKey:EXTRACT_EXIF_KEY]) {
+        [response setObject:[self getJsonString:[self getMetaDataFromImage:encodedURI]] forKey:EXIF_KEY];
     }
     
     callback(@[[NSNull null], response]);
@@ -179,6 +181,41 @@ RCT_EXPORT_METHOD(imageModifier:(NSDictionary *) params
     CFRelease(newImageReference);
 
     return newImage;
+}
+
+- (NSDictionary *) getMetaDataFromImage:(NSString *) uri {
+    NSURL *const url = [NSURL fileURLWithPath: uri];
+    NSData *const data = [NSData dataWithContentsOfURL: url];
+    
+    CGImageSourceRef sourceRef = CGImageSourceCreateWithData((CFDataRef)data, NULL);
+
+    CFDictionaryRef imagePropertiesDictionary = CGImageSourceCopyPropertiesAtIndex(sourceRef,0, NULL);
+
+    CFDictionaryRef exifEXIF = (CFDictionaryRef)CFDictionaryGetValue(imagePropertiesDictionary, kCGImagePropertyExifDictionary);
+    CFDictionaryRef exifGPS = (CFDictionaryRef)CFDictionaryGetValue(imagePropertiesDictionary, kCGImagePropertyGPSDictionary);
+    CFDictionaryRef exifTIFF = (CFDictionaryRef)CFDictionaryGetValue(imagePropertiesDictionary, kCGImagePropertyTIFFDictionary);
+    
+    NSMutableDictionary *metaDataDic = [[NSMutableDictionary alloc] init];
+    
+    if(exifEXIF != nil) {
+        NSDictionary *tmpEXIF = (__bridge NSDictionary*)exifEXIF;
+        [metaDataDic setObject:tmpEXIF forKey:@"EXIF"];
+    }
+    if(exifGPS != nil) {
+        NSDictionary *tmpGPS = (__bridge NSDictionary*)exifGPS;
+        [metaDataDic setObject:tmpGPS forKey:@"GPS"];
+    }
+    if(exifTIFF != nil) {
+        NSDictionary *tmpTIFF = (__bridge NSDictionary*)exifTIFF;
+        [metaDataDic setObject:tmpTIFF forKey:@"TIFF"];
+    }
+    
+    return metaDataDic;
+}
+
+- (NSString *) getJsonString:(NSDictionary *) dicData {
+    NSData* jsonData = [NSJSONSerialization dataWithJSONObject:dicData options:NSJSONWritingPrettyPrinted error:nil];
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
 @end
