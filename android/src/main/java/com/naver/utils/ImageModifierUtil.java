@@ -32,6 +32,7 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.util.Base64;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -178,6 +179,16 @@ public class ImageModifierUtil {
             return base64Encoded;
         } catch (Exception ex) {
             throw new Exception("There was a problem while image to base64 converting.");
+        }
+    }
+
+    public static InputStream getInputStreamFromBitmap(Bitmap bitmap, final Bitmap.CompressFormat compressFormat) throws Exception {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            bitmap.compress(compressFormat, 100, byteArrayOutputStream);
+            byte[] bitmapArray = byteArrayOutputStream.toByteArray();
+            return new ByteArrayInputStream(bitmapArray);
+        } catch (Exception ex) {
+            throw new Exception("There was a problem while image to InputStream converting.");
         }
     }
 }

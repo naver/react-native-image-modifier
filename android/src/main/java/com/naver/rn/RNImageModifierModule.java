@@ -34,10 +34,13 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.naver.utils.EXIFUtils;
 import com.naver.utils.ImageModifierUtil;
 import com.naver.utils.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 public class RNImageModifierModule extends ReactContextBaseJavaModule {
@@ -48,6 +51,7 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
   private static final String ERROR_MESSAGE_KEY = "errorMsg";
   private static final String IMAGE_URI_KEY = "imageURI";
   private static final String BASE64_STRING_KEY = "base64String";
+  private static final String EXIF_KEY = "exif";
 
   private static final String ERROR_MESSAGE_EMPTY_URI_KEY = "URI Path KEY('path') must not be null.";
   private static final String ERROR_MESSAGE_EMPTY_URI_VALUE = "URI Path Value must not be null.";
@@ -58,6 +62,7 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
   private static final String BASE64_KEY = "base64";
   private static final String RESIZE_RATIO_KEY = "resizeRatio";
   private static final String IMAGE_QUALITY_KEY = "imageQuality";
+  private static final String EXTRACT_EXIF_KEY = "extractEXIF";
 
   private static final String ANDROID_URI_FILE_SCHEME = "file://";
 
@@ -118,13 +123,23 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
         }
 
         targetImage.recycle();
+
+        if (data.hasKey(EXTRACT_EXIF_KEY)) {
+          try(InputStream input = this.reactContext.getContentResolver().openInputStream(imageURI)) {
+            final String exifJsonString = EXIFUtils.getEXIFJsonString(input);
+            response.putString(EXIF_KEY, exifJsonString);
+          } catch (Exception ex) {
+            responseCb.invoke(this.getReturnMessage(false, ex.toString()));
+          }
+        }
+
         responseCb.invoke(response);
       } catch (Exception ex) {
-        responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
+        responseCb.invoke(this.getReturnMessage(false, ex.toString()));
       }
     } catch (Exception ex) {
       ex.printStackTrace();
-      responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
+      responseCb.invoke(this.getReturnMessage(false, ex.toString()));
     }
   }
 
