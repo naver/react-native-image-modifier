@@ -1,0 +1,85 @@
+{
+    "GPS" : {
+      "ImgDirection" : 46.638893135606175,
+      "LatitudeRef" : "N",
+      "HPositioningError" : 65,
+      "DestBearingRef" : "T",
+      "Latitude" : 35.688796666666669,
+      "Speed" : 0,
+      "LongitudeRef" : "E",
+      "AltitudeRef" : 0,
+      "Longitude" : 139.70185833333332,
+      "Altitude" : 97.989181561618068,
+      "DestBearing" : 46.638893135606175,
+      "ImgDirectionRef" : "T",
+      "SpeedRef" : "K"
+    },
+    "TIFF" : {
+      "ResolutionUnit" : 2,
+      "Software" : "12.3.2",
+      "TileLength" : 512,
+      "DateTime" : "2019:07:10 16:11:20",
+      "XResolution" : 72,
+      "TileWidth" : 512,
+      "YResolution" : 72,
+      "Model" : "iPhone 8 Plus",
+      "Make" : "Apple"
+    },
+    "EXIF" : {
+      "DateTimeOriginal" : "2019:07:10 16:11:20",
+      "MeteringMode" : 5,
+      "ComponentsConfiguration" : [
+        1,
+        2,
+        3,
+        0
+      ],
+      "BrightnessValue" : 4.4789674952198855,
+      "FocalLenIn35mmFilm" : 28,
+      "LensMake" : "Apple",
+      "FNumber" : 1.8,
+      "FocalLength" : 3.9900000000000002,
+      "ShutterSpeedValue" : 5.4437913299044816,
+      "SubjectArea" : [
+        2015,
+        1511,
+        2217,
+        1330
+      ],
+      "ApertureValue" : 1.6959938128383605,
+      "SceneType" : 1,
+      "SceneCaptureType" : 0,
+      "ColorSpace" : 1,
+      "LensSpecification" : [
+        3.9900000095367432,
+        6.5999999046325684,
+        1.7999999523162842,
+        2.7999999523162842
+      ],
+      "PixelYDimension" : 4032,
+      "WhiteBalance" : 0,
+      "FlashPixVersion" : [
+        1,
+        0
+      ],
+      "DateTimeDigitized" : "2019:07:10 16:11:20",
+      "ISOSpeedRatings" : [
+        32
+      ],
+      "ExposureMode" : 0,
+      "ExifVersion" : [
+        2,
+        2,
+        1
+      ],
+      "PixelXDimension" : 3024,
+      "LensModel" : "iPhone 8 Plus back dual camera 3.99mm f\/1.8",
+      "ExposureProgram" : 2,
+      "ExposureTime" : 0.022727272727272728,
+      "SubsecTimeDigitized" : "392",
+      "Flash" : 24,
+      "SubsecTimeOriginal" : "392",
+      "SensingMethod" : 2,
+      "ExposureBiasValue" : 0
+    }
+  }

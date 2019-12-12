@@ -14,9 +14,10 @@ A React-native module it can modify an image by simply.
  - quality
  - grayscale
  - base64 encoding
+ - exif
 
 ### latest version
- - 0.1.6
+ - 0.1.7
 
 ## install
 
@@ -49,9 +50,10 @@ const param = {
         base64: false, // or true
         resizeRatio: 0.8, // 1.0 is origin value
         imageQuality: 0.7 // 1.0 is max quality value
+        extractEXIF: false // or true
       }
 
-const { success, errorMsg, imageURI, base64String } = await ImageModifier.modify(param)
+const { success, errorMsg, imageURI, base64String, exif } = await ImageModifier.modify(param)
 ```
 
 ## request param
@@ -76,6 +78,10 @@ const { success, errorMsg, imageURI, base64String } = await ImageModifier.modify
  - type : float
  - description : Image quality, between 0.1 to 1.0.
 
+ #### extractEXIF - optional value (default value is false)
+  - type : boolean
+  - description : Get the EXIF metadata from image.
+
 ## response value
 
 #### success
@@ -93,6 +99,10 @@ const { success, errorMsg, imageURI, base64String } = await ImageModifier.modify
 #### base64String
  - type : string
  - description : base64 encoded text data.
+
+### exif
+ - type : json string 
+ - description : The EXIF metadata. Check [this](https://github.com/naver/react-native-image-modifier/blob/master/exif_sample.json) sample.
 
 ## setting the module to the project.
 
