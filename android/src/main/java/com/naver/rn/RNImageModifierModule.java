@@ -40,6 +40,7 @@ import com.naver.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 public class RNImageModifierModule extends ReactContextBaseJavaModule {
@@ -123,22 +124,22 @@ public class RNImageModifierModule extends ReactContextBaseJavaModule {
 
         targetImage.recycle();
 
-        if (data.hasKey(EXIF_KEY) == true) {
-          try {
-            final String exifJsonString = EXIFUtils.getEXIFJsonString(new File(imageURI.toString()));
-            response.putString(EXTRACT_EXIF_KEY, exifJsonString);
-          } catch (IOException ex) {
-            responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
+        if (data.hasKey(EXTRACT_EXIF_KEY)) {
+          try(InputStream input = this.reactContext.getContentResolver().openInputStream(imageURI)) {
+            final String exifJsonString = EXIFUtils.getEXIFJsonString(input);
+            response.putString(EXIF_KEY, exifJsonString);
+          } catch (Exception ex) {
+            responseCb.invoke(this.getReturnMessage(false, ex.toString()));
           }
         }
 
         responseCb.invoke(response);
       } catch (Exception ex) {
-        responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
+        responseCb.invoke(this.getReturnMessage(false, ex.toString()));
       }
     } catch (Exception ex) {
       ex.printStackTrace();
-      responseCb.invoke(this.getReturnMessage(false, ex.getMessage()));
+      responseCb.invoke(this.getReturnMessage(false, ex.toString()));
     }
   }
 

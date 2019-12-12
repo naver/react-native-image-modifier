@@ -27,111 +27,175 @@ import android.media.ExifInterface;
 
 import com.google.gson.Gson;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EXIFUtils {
 
-    private static String[] EXIF_VALUE_KEYS = new String[]{
-            ExifInterface.TAG_APERTURE_VALUE,
-            ExifInterface.TAG_BRIGHTNESS_VALUE,
-            ExifInterface.TAG_COLOR_SPACE,
-            ExifInterface.TAG_COMPONENTS_CONFIGURATION,
-            ExifInterface.TAG_DATETIME_DIGITIZED,
-            ExifInterface.TAG_DATETIME_ORIGINAL,
-            ExifInterface.TAG_EXIF_VERSION,
-            ExifInterface.TAG_EXPOSURE_BIAS_VALUE,
-            ExifInterface.TAG_EXPOSURE_MODE,
-            ExifInterface.TAG_EXPOSURE_PROGRAM,
-            ExifInterface.TAG_EXPOSURE_TIME,
-            ExifInterface.TAG_F_NUMBER,
-            ExifInterface.TAG_FLASH,
-            ExifInterface.TAG_FLASHPIX_VERSION,
-            ExifInterface.TAG_FOCAL_LENGTH_IN_35MM_FILM,
-            ExifInterface.TAG_FOCAL_LENGTH,
-            ExifInterface.TAG_ISO_SPEED_RATINGS,
-            ExifInterface.TAG_METERING_MODE,
-            ExifInterface.TAG_PIXEL_X_DIMENSION,
-            ExifInterface.TAG_PIXEL_Y_DIMENSION,
-            ExifInterface.TAG_SCENE_CAPTURE_TYPE,
-            ExifInterface.TAG_SCENE_TYPE,
-            ExifInterface.TAG_SENSING_METHOD,
-            ExifInterface.TAG_SHUTTER_SPEED_VALUE,
-            ExifInterface.TAG_SUBJECT_AREA,
-            ExifInterface.TAG_SUBSEC_TIME_DIGITIZED,
-            ExifInterface.TAG_SUBSEC_TIME_ORIG,
-            ExifInterface.TAG_WHITE_BALANCE
+    private static final Map<Class, List<String>> EXIF_VALUE_KEYS = new HashMap<>();
+    static {
+        // Double
+        List<String> doubleType = new ArrayList<>();
+        doubleType.add(ExifInterface.TAG_APERTURE_VALUE);
+        doubleType.add(ExifInterface.TAG_BRIGHTNESS_VALUE);
+        doubleType.add(ExifInterface.TAG_EXPOSURE_BIAS_VALUE);
+        doubleType.add(ExifInterface.TAG_EXPOSURE_TIME);
+        doubleType.add(ExifInterface.TAG_F_NUMBER);
+        doubleType.add(ExifInterface.TAG_FOCAL_LENGTH);
+        doubleType.add(ExifInterface.TAG_SHUTTER_SPEED_VALUE);
+
+        EXIF_VALUE_KEYS.put(Double.class, doubleType);
+
+        // Integer
+        List<String> intType = new ArrayList<>();
+        intType.add(ExifInterface.TAG_COLOR_SPACE);
+        intType.add(ExifInterface.TAG_EXPOSURE_MODE);
+        intType.add(ExifInterface.TAG_EXPOSURE_PROGRAM);
+        intType.add(ExifInterface.TAG_FLASH);
+        intType.add(ExifInterface.TAG_FOCAL_LENGTH_IN_35MM_FILM);
+        intType.add(ExifInterface.TAG_ISO_SPEED_RATINGS);
+        intType.add(ExifInterface.TAG_METERING_MODE);
+        intType.add(ExifInterface.TAG_PIXEL_X_DIMENSION);
+        intType.add(ExifInterface.TAG_PIXEL_Y_DIMENSION);
+        intType.add(ExifInterface.TAG_SCENE_CAPTURE_TYPE);
+        intType.add(ExifInterface.TAG_SENSING_METHOD);
+        intType.add(ExifInterface.TAG_SUBJECT_AREA);
+        intType.add(ExifInterface.TAG_WHITE_BALANCE);
+        intType.add(ExifInterface.TAG_SCENE_TYPE);
+
+        EXIF_VALUE_KEYS.put(Integer.class, intType);
+
+        // String
+        List<String> stringType = new ArrayList<>();
+//        stringType.add(ExifInterface.TAG_COMPONENTS_CONFIGURATION);
+        stringType.add(ExifInterface.TAG_DATETIME_DIGITIZED);
+        stringType.add(ExifInterface.TAG_DATETIME_ORIGINAL);
+        stringType.add(ExifInterface.TAG_EXIF_VERSION);
+        stringType.add(ExifInterface.TAG_FLASHPIX_VERSION);
+        stringType.add(ExifInterface.TAG_SUBSEC_TIME_DIGITIZED);
+        stringType.add(ExifInterface.TAG_SUBSEC_TIME_ORIGINAL);
+
+        EXIF_VALUE_KEYS.put(String.class, stringType);
     };
 
-    private static String[] TIFF_VALUE_KEYS = new String[] {
-            ExifInterface.TAG_DATETIME,
-            ExifInterface.TAG_MAKE,
-            ExifInterface.TAG_MODEL,
-            ExifInterface.TAG_RESOLUTION_UNIT,
-            ExifInterface.TAG_SOFTWARE,
-            ExifInterface.TAG_X_RESOLUTION,
-            ExifInterface.TAG_Y_RESOLUTION
+    private static final Map<Class, List<String>> TIFF_VALUE_KEYS = new HashMap<>();
+    static {
+        // Double
+        List<String> doubleType = new ArrayList<>();
+        doubleType.add(ExifInterface.TAG_X_RESOLUTION);
+        doubleType.add(ExifInterface.TAG_Y_RESOLUTION);
+
+        TIFF_VALUE_KEYS.put(Double.class, doubleType);
+
+        // Integer
+        List<String> intType = new ArrayList<>();
+        intType.add(ExifInterface.TAG_RESOLUTION_UNIT);
+
+        TIFF_VALUE_KEYS.put(Integer.class, intType);
+
+        // String
+        List<String> stringType = new ArrayList<>();
+        stringType.add(ExifInterface.TAG_DATETIME);
+        stringType.add(ExifInterface.TAG_MAKE);
+        stringType.add(ExifInterface.TAG_MODEL);
+        stringType.add(ExifInterface.TAG_SOFTWARE);
+
+        TIFF_VALUE_KEYS.put(String.class, stringType);
     }
 
-    private static String[] GPS_VALUE_KEYS = new String[]{
-        ExifInterface.TAG_GPS_AREA_INFORMATION,
-        ExifInterface.TAG_GPS_DATESTAMP,
-        ExifInterface.TAG_GPS_DEST_BEARING_REF,
-        ExifInterface.TAG_GPS_DEST_DISTANCE_REF,
-        ExifInterface.TAG_GPS_DEST_LATITUDE_REF,
-        ExifInterface.TAG_GPS_DEST_LONGITUDE_REF,
-        ExifInterface.TAG_GPS_IMG_DIRECTION_REF,
-        ExifInterface.TAG_GPS_LATITUDE_REF,
-        ExifInterface.TAG_GPS_LONGITUDE_REF,
-        ExifInterface.TAG_GPS_MAP_DATUM,
-        ExifInterface.TAG_GPS_MEASURE_MODE,
-        ExifInterface.TAG_GPS_PROCESSING_METHOD,
-        ExifInterface.TAG_GPS_SATELLITES,
-        ExifInterface.TAG_GPS_SPEED_REF,
-        ExifInterface.TAG_GPS_STATUS,
-        ExifInterface.TAG_GPS_TIMESTAMP,
-        ExifInterface.TAG_GPS_TRACK_REF,
-        ExifInterface.TAG_GPS_VERSION_ID,
-        ExifInterface.TAG_GPS_DEST_BEARING,
-        ExifInterface.TAG_GPS_DEST_DISTANCE,
-        ExifInterface.TAG_GPS_DEST_LATITUDE,
-        ExifInterface.TAG_GPS_DEST_LONGITUDE,
-        ExifInterface.TAG_GPS_DOP,
-        ExifInterface.TAG_GPS_IMG_DIRECTION,
-        ExifInterface.TAG_GPS_LATITUDE,
-        ExifInterface.TAG_GPS_LONGITUDE,
-        ExifInterface.TAG_GPS_SPEED,
-        ExifInterface.TAG_GPS_TRACK,
-        ExifInterface.TAG_GPS_ALTITUDE,
-        ExifInterface.TAG_GPS_ALTITUDE_REF,
-        ExifInterface.TAG_GPS_DIFFERENTIAL,
-    };
+    private static final Map<Class, List<String>> GPS_VALUE_KEYS = new HashMap<>();
+    static {
+        // Double
+        List<String> doubleType = new ArrayList<>();
+        doubleType.add(ExifInterface.TAG_GPS_DEST_BEARING);
+        doubleType.add(ExifInterface.TAG_GPS_DEST_DISTANCE);
+        doubleType.add(ExifInterface.TAG_GPS_DEST_LATITUDE);
+        doubleType.add(ExifInterface.TAG_GPS_DEST_LONGITUDE);
+        doubleType.add(ExifInterface.TAG_GPS_DOP);
+        doubleType.add(ExifInterface.TAG_GPS_IMG_DIRECTION);
+        doubleType.add(ExifInterface.TAG_GPS_LATITUDE);
+        doubleType.add(ExifInterface.TAG_GPS_LONGITUDE);
+        doubleType.add(ExifInterface.TAG_GPS_SPEED);
+        doubleType.add(ExifInterface.TAG_GPS_TRACK);
+        doubleType.add(ExifInterface.TAG_GPS_ALTITUDE);
 
-    private static Gson GSON_OBJ = new Gson();
+        GPS_VALUE_KEYS.put(Double.class, doubleType);
 
-    private static String EXIF_KEY = "EXIF";
-    private static String GPS_KEY = "GPS";
-    private static String TIFF_KEY = "TIFF";
+        // Integer
+        List<String> intType = new ArrayList<>();
+        intType.add(ExifInterface.TAG_GPS_ALTITUDE_REF);
+        intType.add(ExifInterface.TAG_GPS_DIFFERENTIAL);
 
-    public static String getEXIFJsonString(final File file) throws IOException {
-        ExifInterface originalExif = new ExifInterface(file.getAbsolutePath());
+        GPS_VALUE_KEYS.put(Integer.class, intType);
 
-        Map<String, Object> exifMap = Arrays.asList(EXIF_VALUE_KEYS).stream()
-                .collect(Collectors.toMap(str -> str, str -> originalExif.getAttribute(str)));
-        Map<String, String> gpsMap = Arrays.asList(GPS_VALUE_KEYS).stream()
-                .collect(Collectors.toMap(str -> str, str -> String.valueOf(originalExif.getAttribute(str))));
-        Map<String, String> tiffMap = Arrays.asList(TIFF_VALUE_KEYS).stream()
-                .collect(Collectors.toMap(str -> str, str -> String.valueOf(originalExif.getAttribute(str))));
+        // String
+        List<String> stringType = new ArrayList<>();
+        stringType.add(ExifInterface.TAG_GPS_AREA_INFORMATION);
+        stringType.add(ExifInterface.TAG_GPS_DATESTAMP);
+        stringType.add(ExifInterface.TAG_GPS_DEST_BEARING_REF);
+        stringType.add(ExifInterface.TAG_GPS_DEST_DISTANCE_REF);
+        stringType.add(ExifInterface.TAG_GPS_DEST_LATITUDE_REF);
+        stringType.add(ExifInterface.TAG_GPS_DEST_LONGITUDE_REF);
+        stringType.add(ExifInterface.TAG_GPS_IMG_DIRECTION_REF);
+        stringType.add(ExifInterface.TAG_GPS_LATITUDE_REF);
+        stringType.add(ExifInterface.TAG_GPS_LONGITUDE_REF);
+        stringType.add(ExifInterface.TAG_GPS_MAP_DATUM);
+        stringType.add(ExifInterface.TAG_GPS_MEASURE_MODE);
+        stringType.add(ExifInterface.TAG_GPS_PROCESSING_METHOD);
+        stringType.add(ExifInterface.TAG_GPS_SATELLITES);
+        stringType.add(ExifInterface.TAG_GPS_SPEED_REF);
+        stringType.add(ExifInterface.TAG_GPS_STATUS);
+        stringType.add(ExifInterface.TAG_GPS_TIMESTAMP);
+        stringType.add(ExifInterface.TAG_GPS_TRACK_REF);
+        stringType.add(ExifInterface.TAG_GPS_VERSION_ID);
+
+        GPS_VALUE_KEYS.put(String.class, stringType);
+    }
+
+    private static final Gson GSON_OBJ = new Gson();
+
+    private static final String EXIF_KEY = "EXIF";
+    private static final String GPS_KEY = "GPS";
+    private static final String TIFF_KEY = "TIFF";
+
+    public static String getEXIFJsonString(final InputStream inputStream) throws IOException {
+        ExifInterface originalExif = new ExifInterface(inputStream);
 
         Map<String, Object> resultMpa = new HashMap<>();
-        resultMpa.put(EXIF_KEY, exifMap);
-        resultMpa.put(GPS_KEY, gpsMap);
-        resultMpa.put(TIFF_KEY, tiffMap);
+        resultMpa.put(EXIF_KEY, getMetaInfoMap(originalExif, EXIF_VALUE_KEYS));
+        resultMpa.put(GPS_KEY, getMetaInfoMap(originalExif, GPS_VALUE_KEYS));
+        resultMpa.put(TIFF_KEY, getMetaInfoMap(originalExif, TIFF_VALUE_KEYS));
 
         return GSON_OBJ.toJson(resultMpa);
+    }
+
+    private static Map<String, Object> getMetaInfoMap(ExifInterface originalExif, Map<Class, List<String>> inputMap) {
+        Map<String, Object> outputMap = new HashMap<>();
+        for (Map.Entry<Class, List<String>> keyClass : inputMap.entrySet()) {
+            if (keyClass.getKey() == String.class) {
+                for (String key : inputMap.get(keyClass.getKey())) {
+                    try {
+                        outputMap.put(key, originalExif.getAttribute(key));
+                    } catch (Exception ignore) {}
+                }
+            } else if (keyClass.getKey() == Integer.class) {
+                for (String key : inputMap.get(keyClass.getKey())) {
+                    try {
+                        outputMap.put(key, originalExif.getAttributeInt(key, 0));
+                    } catch (Exception ignore) {}
+                }
+            } else if (keyClass.getKey() == Double.class) {
+                for (String key : inputMap.get(keyClass.getKey())) {
+                    try {
+                        outputMap.put(key, originalExif.getAttributeDouble(key, 0.0));
+                    } catch (Exception ignore) {}
+                }
+            }
+        }
+        return outputMap;
     }
 }

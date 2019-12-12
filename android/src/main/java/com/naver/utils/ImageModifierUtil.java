@@ -29,10 +29,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.util.Base64;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 public class ImageModifierUtil {
@@ -180,6 +179,16 @@ public class ImageModifierUtil {
             return base64Encoded;
         } catch (Exception ex) {
             throw new Exception("There was a problem while image to base64 converting.");
+        }
+    }
+
+    public static InputStream getInputStreamFromBitmap(Bitmap bitmap, final Bitmap.CompressFormat compressFormat) throws Exception {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+            bitmap.compress(compressFormat, 100, byteArrayOutputStream);
+            byte[] bitmapArray = byteArrayOutputStream.toByteArray();
+            return new ByteArrayInputStream(bitmapArray);
+        } catch (Exception ex) {
+            throw new Exception("There was a problem while image to InputStream converting.");
         }
     }
 }
