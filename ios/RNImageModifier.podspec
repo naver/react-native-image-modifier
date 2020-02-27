@@ -1,6 +1,6 @@
 require 'json'
 
-pakcage = JSON.parse(File.read(File.join('..', 'package.json')))
+package = JSON.parse(File.read(File.join('..', 'package.json')))
 
 Pod::Spec.new do |s|
   s.name         = "RNImageModifier"
