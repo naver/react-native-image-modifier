@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-modifier",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Modify local images by the React-native module. (IOS, Android)",
   "main": "index.js",
   "scripts": {

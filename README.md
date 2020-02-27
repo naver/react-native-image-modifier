@@ -17,9 +17,7 @@ A React-native module it can modify an image by simply.
  - exif
 
 ### latest version
- - 0.1.8
-     - fixed an error occurs to the pod install, on RN@0.6x.
-     - https://github.com/naver/react-native-image-modifier/pull/5
+ - 0.1.9
 
 ## install
 
